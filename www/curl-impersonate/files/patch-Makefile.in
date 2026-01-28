@@ -1,0 +1,38 @@
+--- Makefile.in.orig	2026-01-21 13:33:41 UTC
++++ Makefile.in
+@@ -161,6 +161,7 @@ $(brotli_static_libs): brotli-$(BROTLI_VERSION).tar.gz
+ 		-DCMAKE_SYSTEM_NAME=$$system_name \
+ 		-DCMAKE_SYSTEM_PROCESSOR=$(host_cpu) \
+ 		-DBUILD_SHARED_LIBS=OFF \
++		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+ 		..
+ 
+ 	@cmake@ --build . --config Release --target install --parallel $(SUBJOBS)
+@@ -208,8 +209,9 @@ $(boringssl_static_libs): boringssl-$(BORING_SSL_COMMI
+ 			-DCMAKE_SYSTEM_NAME=$$system_name \
+ 			-DCMAKE_SYSTEM_PROCESSOR=$(host_cpu) \
+ 			-GNinja \
++			-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+ 			..
+-	@ninja@ -j$(SUBJOBS)
++	@ninja@ -j$(SUBJOBS) -v
+ 
+ 	# Fix the directory structure so that curl can compile against it.
+ 	# See: https://everything.curl.dev/build/boringssl.html
+@@ -224,6 +226,7 @@ $(nghttp2_static_libs): nghttp2-$(NGHTTP2_VERSION).tar
+ $(nghttp2_static_libs): nghttp2-$(NGHTTP2_VERSION).tar.bz2
+ 	tar -xf nghttp2-$(NGHTTP2_VERSION).tar.bz2
+ 	cd nghttp2-$(NGHTTP2_VERSION)
++	autoreconf -i
+ 
+ 	# Set up the configure flags to nghttp2.
+ 	# If the user provided the --host flag to our configure script
+@@ -276,6 +279,8 @@ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar
+ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar.bz2
+ 	tar -xf nghttp3-$(NGHTTP3_VERSION).tar.bz2
+ 	cd nghttp3-$(NGHTTP3_VERSION)
++	ln -s ../../sfparse-$(CURL_IM_NGHTTP2_SFPARS_VERSION) lib/sfparse
++	autoreconf -i
+ 
+ 	# Set up the configure flags to nghttp3.
+ 	# If the user provided the --host flag to our configure script
