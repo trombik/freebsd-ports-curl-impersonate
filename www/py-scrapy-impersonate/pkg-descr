@@ -1,0 +1,3 @@
+scrapy-impersonate is a Scrapy download handler. This project integrates
+curl_cffi to perform HTTP requests, so it can impersonate browsers' TLS
+signatures or JA3 fingerprints.
