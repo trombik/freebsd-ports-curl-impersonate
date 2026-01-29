@@ -1,5 +1,26 @@
 --- Makefile.in.orig	2026-01-21 13:33:41 UTC
 +++ Makefile.in
+@@ -98,7 +98,7 @@ install:
+ 	cd $(CURL_VERSION)
+ 	$(MAKE) install-exec MAKEFLAGS=
+ 	# Wrapper scripts for the cli shortcut (e.g. 'curl_chrome99')
+-	install $(srcdir)/bin/curl_* @bindir@
++	install $(srcdir)/bin/curl_* $(DESTDIR)@bindir@
+ .PHONY: install
+ 
+ install-strip: ## Like 'install', but strip binaries for smaller size
+@@ -106,9 +106,9 @@ install-strip: ## Like 'install', but strip binaries f
+ 	$(MAKE) install-exec MAKEFLAGS=
+ 	# We could have used 'install-strip' but then the docs would be installed as well.
+ 	# Instead strip manually.
+-	$(STRIP) @bindir@/curl-impersonate
++	$(STRIP) $(DESTDIR)@bindir@/curl-impersonate
+ 	# Wrapper scripts for the cli shortcut (e.g. 'curl_chrome99')
+-	install $(srcdir)/bin/curl_* @bindir@
++	install $(srcdir)/bin/curl_* $(DESTDIR)@bindir@
+ .PHONY: install-strip
+ 
+ uninstall: ## Uninstall the Chrome version of curl-impersonate after 'make install'
 @@ -161,6 +161,7 @@ $(brotli_static_libs): brotli-$(BROTLI_VERSION).tar.gz
  		-DCMAKE_SYSTEM_NAME=$$system_name \
  		-DCMAKE_SYSTEM_PROCESSOR=$(host_cpu) \
@@ -27,12 +48,19 @@
  
  	# Set up the configure flags to nghttp2.
  	# If the user provided the --host flag to our configure script
-@@ -276,6 +279,8 @@ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar
+@@ -276,6 +279,7 @@ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar
  $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar.bz2
  	tar -xf nghttp3-$(NGHTTP3_VERSION).tar.bz2
  	cd nghttp3-$(NGHTTP3_VERSION)
-+	ln -s ../../sfparse-$(CURL_IM_NGHTTP2_SFPARS_VERSION) lib/sfparse
 +	autoreconf -i
  
  	# Set up the configure flags to nghttp3.
  	# If the user provided the --host flag to our configure script
+@@ -299,6 +303,7 @@ $(cares_static_libs): c-ares-$(CARES_VERSION).tar.gz
+ $(cares_static_libs): c-ares-$(CARES_VERSION).tar.gz
+ 	tar -xzf c-ares-$(CARES_VERSION).tar.gz
+ 	cd c-ares-$(CARES_VERSION)
++	autoreconf -i
+ 
+ 	{ \
+ 		config_flags="--prefix=$(cares_install_dir)"; \

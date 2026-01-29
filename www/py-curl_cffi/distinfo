@@ -1,0 +1,7 @@
+TIMESTAMP = 1769662729
+SHA256 (lexiforest-curl_cffi-v0.14.0_GH0.tar.gz) = 59d652f1c816264793260bc3b545afa90d63fd572f2cc6e3a2d552f40a17cf00
+SIZE (lexiforest-curl_cffi-v0.14.0_GH0.tar.gz) = 784400
+SHA256 (curl-curl-curl-8_15_0_GH0.tar.gz) = 2937cadde007aa3a52a17c21ac9153ea054700f37926d1d96602bf07e888c847
+SIZE (curl-curl-curl-8_15_0_GH0.tar.gz) = 3483257
+SHA256 (lexiforest-curl-impersonate-v1.2.5_GH0.tar.gz) = a1ca82eea668f6116cd433f1d1df33dd86326787f586664ec7744081cc0dea1c
+SIZE (lexiforest-curl-impersonate-v1.2.5_GH0.tar.gz) = 162159

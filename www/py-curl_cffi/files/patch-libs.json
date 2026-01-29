@@ -1,0 +1,19 @@
+--- libs.json.orig	2026-01-29 06:15:42 UTC
++++ libs.json
+@@ -131,5 +131,16 @@
+         "libc": "gnueabihf",
+         "so_name": "libcurl-impersonate.so",
+         "so_arch": "arm"
++    },
++    {
++        "system": "FreeBSD",
++        "machine": "amd64",
++        "pointer_size": 64,
++        "libdir": "%%LOCALBASE%%/lib",
++        "sysname": "freebsd",
++        "link_type": "static",
++        "libc": "musl",
++        "so_name": "libcurl-impersonate.so",
++        "so_arch": "x86_64"
+     }
+ ]

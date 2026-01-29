@@ -1,0 +1,2 @@
+Python binding for curl-impersonate fork via cffi. A http client that can
+impersonate browser tls/ja3/http2 fingerprints.

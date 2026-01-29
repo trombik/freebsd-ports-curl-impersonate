@@ -1,0 +1,21 @@
+--- Makefile.orig	2025-12-16 02:52:44 UTC
++++ Makefile
+@@ -11,9 +11,6 @@ curl-impersonate-$(VERSION)/patches: $(CURL_VERSION)
+ 	mv curl-$(CURL_VERSION) $(CURL_VERSION)
+ 
+ curl-impersonate-$(VERSION)/patches: $(CURL_VERSION)
+-	curl -L "https://github.com/lexiforest/curl-impersonate/archive/refs/tags/v$(VERSION).tar.gz" \
+-		-o "curl-impersonate-$(VERSION).tar.gz"
+-	tar -xf curl-impersonate-$(VERSION).tar.gz
+ 
+ .preprocessed: curl-impersonate-$(VERSION)/patches
+ 	cd $(CURL_VERSION)
+@@ -49,8 +46,6 @@ build: .preprocessed
+ 
+ build: .preprocessed
+ 	rm -rf dist/
+-	pip install build
+-	python -m build --wheel
+ 
+ lint:
+ 	ruff check --exclude issues

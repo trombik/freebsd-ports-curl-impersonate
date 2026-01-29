@@ -1,6 +1,6 @@
 PORTNAME=	curl-impersonate
 PORTVERSION=	1.3.0
-DISTVERSION=	v${PORTVERSION}
+DISTVERSIONPREFIX=	v
 CATEGORIES=	www
 
 MAINTAINER=	y@trombik.org
@@ -12,30 +12,36 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 EXTRACT_DEPENDS= zip:archivers/zip
 
-BUILD_DEPENDS=	bash:shells/bash \
+BUILD_DEPENDS=	\
+	bash:shells/bash \
 	unzip:archivers/unzip
 
-LIB_DEPENDS=	libcurl.so:ftp/curl \
+LIB_DEPENDS=	\
+	libidn2.so:dns/libidn2 \
 	libzstd.so:archivers/zstd
 
 USES=	libtool pkgconfig autoreconf:build gmake cmake:indirect ninja:build
 USE_GITHUB=	yes
 GH_ACCOUNT=	lexiforest
 GH_TUPLE=	\
-			google:brotli:v${CURL_IM_BROTLI_VERSION}:brotli	\
-			nghttp2:nghttp2:v${CURL_IM_NGHTTP2_VERSION}:nghttp2	\
-			ngtcp2:nghttp3:v${CURL_IM_NGHTTP3_VERSION}:nghttp3 \
-			ngtcp2:ngtcp2:v${CURL_IM_NGTCP2_VERSION}:ngtcp2	\
-			c-ares:c-ares:v${CURL_IM_CARES_VERSION}:c_ares		\
-			curl:curl:curl-${CURL_IM_CURL_VERSION}:curl \
-			google:boringssl:${CURL_IM_BORING_SSL_VERSION}:boringssl \
-			ngtcp2:sfparse:${CURL_IM_NGHTTP2_SFPARS_VERSION}:sfparse \
+	google:brotli:v${CURL_IM_BROTLI_VERSION}:brotli	\
+	nghttp2:nghttp2:v${CURL_IM_NGHTTP2_VERSION}:nghttp2	\
+	ngtcp2:nghttp3:v${CURL_IM_NGHTTP3_VERSION}:nghttp3 \
+	ngtcp2:ngtcp2:v${CURL_IM_NGTCP2_VERSION}:ngtcp2	\
+	c-ares:c-ares:v${CURL_IM_CARES_VERSION}:c_ares		\
+	curl:curl:curl-${CURL_IM_CURL_VERSION}:curl \
+	google:boringssl:${CURL_IM_BORING_SSL_VERSION}:boringssl \
+	ngtcp2:sfparse:${CURL_IM_NGHTTP2_SFPARS_VERSION}:sfparse \
 
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--with-zstd=${PREFIX}
+
 ALL_TARGET=	build
 MAKE_ARGS=	V=1 SUBJOBS=${MAKE_JOBS_NUMBER}
+CFLAGS+=	-fPIC  -Werror=implicit-function-declaration
+LDFLAGS+=	-L${LOCALBASE}/lib -Wl,-rpath=${LOCALBASE}/lib
 
+# see Makefile.in
 CURL_IM_BROTLI_VERSION=	1.1.0
 CURL_IM_NGHTTP2_VERSION=	1.63.0
 CURL_IM_NGHTTP3_VERSION=	1.9.0
@@ -44,10 +50,12 @@ CURL_IM_CARES_VERSION=	1.30.0
 CURL_IM_CURL_VERSION=	8_15_0
 CURL_IM_BORING_SSL_VERSION=	673e61fc215b178a90c0e67858bbf162c8158993
 
-# git submodule
+# git submodule for nghttp3
 CURL_IM_NGHTTP2_SFPARS_VERSION=	7eaf5b6
 
 post-extract:
+	${RM} -r ${WRKDIR}/nghttp3-${CURL_IM_NGHTTP3_VERSION}/lib/sfparse
+	${CP} -r ${WRKDIR}/sfparse-${CURL_IM_NGHTTP2_SFPARS_VERSION} ${WRKDIR}/nghttp3-${CURL_IM_NGHTTP3_VERSION}/lib/sfparse
 .for _org _project _tag _src_group in ${GH_TUPLE:C/:/ /g}
 .	if ${_project} == boringssl
 		(cd ${WRKDIR} && zip -q -r ${WRKSRC}/${_project}-${_tag}.zip ${_project}-${_tag})
@@ -59,5 +67,9 @@ post-extract:
 		(cd ${WRKSRC} && ${TAR} -czf ${_project}-${_tag:C/v//}.tar.gz -C ${WRKDIR} ${_project}-${_tag:C/v//})
 .	endif
 .endfor
+
+post-install:
+	# resolve conflict with ftp/curl
+	${MV} ${STAGEDIR}${PREFIX}/bin/wcurl ${STAGEDIR}${PREFIX}/bin/wcurl-impersonate
 
 .include <bsd.port.mk>
