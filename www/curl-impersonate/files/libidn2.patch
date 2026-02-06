@@ -1,0 +1,9 @@
+--- libidn2.pc.in.orig	2026-02-07 11:45:58.819664000 +0700
++++ libidn2.pc.in	2026-02-07 11:47:41.292569000 +0700
+@@ -7,5 +7,5 @@
+ Description: Library implementing IDNA2008 and TR46
+ Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir}
+-Libs: -L${libdir} -lidn2
++Libs: ${libdir}/libidn2.a
+ Libs.private: @LTLIBICONV@ @LTLIBUNISTRING@

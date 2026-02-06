@@ -1,46 +1,56 @@
---- Makefile.in.orig	2026-01-21 13:33:41 UTC
+--- Makefile.in.orig	2026-02-04 03:49:13 UTC
 +++ Makefile.in
-@@ -98,7 +98,7 @@ install:
- 	cd $(CURL_VERSION)
- 	$(MAKE) install-exec MAKEFLAGS=
- 	# Wrapper scripts for the cli shortcut (e.g. 'curl_chrome99')
--	install $(srcdir)/bin/curl_* @bindir@
-+	install $(srcdir)/bin/curl_* $(DESTDIR)@bindir@
- .PHONY: install
+@@ -84,8 +84,8 @@ chrome_libs := $(zlib_static_libs) $(zstd_static_libs)
  
- install-strip: ## Like 'install', but strip binaries for smaller size
-@@ -106,9 +106,9 @@ install-strip: ## Like 'install', but strip binaries f
- 	$(MAKE) install-exec MAKEFLAGS=
+ # Dependencies needed to compile the Chrome version
+ chrome_libs := $(zlib_static_libs) $(zstd_static_libs) $(brotli_static_libs) $(boringssl_static_libs) $(nghttp2_static_libs) $(ngtcp2_static_libs) $(nghttp3_static_libs)
+-ifneq ($(filter linux%,$(host_os)),)
+-chrome_libs += $(libidn2_static_libs)
++ifneq ($(filter freebsd%,$(host_os)),)
++chrome_libs += $(libidn2_static_libs) $(libunistring_static_libs)
+ endif
+ 
+ # Auto-generate Makefile help.
+@@ -125,7 +125,8 @@ install:
+ 	cd $(CURL_VERSION)
+ 	$(MAKE) install-exec DESTDIR="$(DESTDIR)" MAKEFLAGS=
+ 	mkdir -p "$(DESTDIR)@includedir@"
+-	cp -R include/curl "$(DESTDIR)@includedir@"
++	rm include/curl/Makefile*
++	cp -R include/curl "$(DESTDIR)@includedir@/curl-impersonate"
+ 	# Wrapper scripts for the cli shortcut (e.g. 'curl_chrome99')
+ 	install $(srcdir)/bin/curl_* "$(DESTDIR)@bindir@"
+ .PHONY: install
+@@ -134,7 +135,8 @@ install-strip: ## Like 'install', but strip binaries f
+ 	cd $(CURL_VERSION)
+ 	$(MAKE) install-exec DESTDIR="$(DESTDIR)" MAKEFLAGS=
+ 	mkdir -p "$(DESTDIR)@includedir@"
+-	cp -R include/curl "$(DESTDIR)@includedir@"
++	rm include/curl/Makefile*
++	cp -R include/curl "$(DESTDIR)@includedir@/curl-impersonate"
  	# We could have used 'install-strip' but then the docs would be installed as well.
  	# Instead strip manually.
--	$(STRIP) @bindir@/curl-impersonate
-+	$(STRIP) $(DESTDIR)@bindir@/curl-impersonate
- 	# Wrapper scripts for the cli shortcut (e.g. 'curl_chrome99')
--	install $(srcdir)/bin/curl_* @bindir@
-+	install $(srcdir)/bin/curl_* $(DESTDIR)@bindir@
- .PHONY: install-strip
- 
- uninstall: ## Uninstall the Chrome version of curl-impersonate after 'make install'
-@@ -161,6 +161,7 @@ $(brotli_static_libs): brotli-$(BROTLI_VERSION).tar.gz
- 		-DCMAKE_SYSTEM_NAME=$$system_name \
- 		-DCMAKE_SYSTEM_PROCESSOR=$(host_cpu) \
- 		-DBUILD_SHARED_LIBS=OFF \
+ 	$(STRIP) "$(DESTDIR)@bindir@/curl-impersonate"
+@@ -239,6 +241,7 @@ $(brotli_static_libs): brotli-$(BROTLI_VERSION).tar.gz
+ 		-DBROTLI_DISABLE_TOOLS=ON \
+ 		-DBROTLI_BUILD_TOOLS=OFF \
+ 		-DCMAKE_MACOSX_BUNDLE=OFF \
 +		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
  		..
  
  	@cmake@ --build . --config Release --target install --parallel $(SUBJOBS)
-@@ -208,8 +209,9 @@ $(boringssl_static_libs): boringssl-$(BORING_SSL_COMMI
- 			-DCMAKE_SYSTEM_NAME=$$system_name \
+@@ -304,8 +307,9 @@ $(boringssl_static_libs): boringssl-$(BORING_SSL_COMMI
  			-DCMAKE_SYSTEM_PROCESSOR=$(host_cpu) \
+ 			$$cmake_osx_flags \
  			-GNinja \
 +			-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
  			..
--	@ninja@ -j$(SUBJOBS)
-+	@ninja@ -j$(SUBJOBS) -v
+-	@ninja@ -j$(SUBJOBS) crypto ssl
++	@ninja@ -v -j$(SUBJOBS) crypto ssl
  
  	# Fix the directory structure so that curl can compile against it.
  	# See: https://everything.curl.dev/build/boringssl.html
-@@ -224,6 +226,7 @@ $(nghttp2_static_libs): nghttp2-$(NGHTTP2_VERSION).tar
+@@ -320,6 +324,7 @@ $(nghttp2_static_libs): nghttp2-$(NGHTTP2_VERSION).tar
  $(nghttp2_static_libs): nghttp2-$(NGHTTP2_VERSION).tar.bz2
  	tar -xf nghttp2-$(NGHTTP2_VERSION).tar.bz2
  	cd nghttp2-$(NGHTTP2_VERSION)
@@ -48,19 +58,28 @@
  
  	# Set up the configure flags to nghttp2.
  	# If the user provided the --host flag to our configure script
-@@ -276,6 +279,7 @@ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar
+@@ -372,6 +377,7 @@ $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar
  $(nghttp3_static_libs): nghttp3-$(NGHTTP3_VERSION).tar.bz2
  	tar -xf nghttp3-$(NGHTTP3_VERSION).tar.bz2
  	cd nghttp3-$(NGHTTP3_VERSION)
 +	autoreconf -i
  
- 	# Set up the configure flags to nghttp3.
+ 	# Set up the configure flags to nghttp2.
  	# If the user provided the --host flag to our configure script
-@@ -299,6 +303,7 @@ $(cares_static_libs): c-ares-$(CARES_VERSION).tar.gz
- $(cares_static_libs): c-ares-$(CARES_VERSION).tar.gz
- 	tar -xzf c-ares-$(CARES_VERSION).tar.gz
- 	cd c-ares-$(CARES_VERSION)
-+	autoreconf -i
+@@ -423,7 +429,6 @@ $(libidn2_static_libs): libidn2-$(LIBIDN2_VERSION).tar
+ 		./configure $$config_flags
+ 	$(MAKE) MAKEFLAGS=-j$(SUBJOBS)
+ 	$(MAKE) install MAKEFLAGS=
+-
+ $(CURL_VERSION).tar.gz:
+ 	curl -L "https://github.com/curl/curl/archive/$(CURL_VERSION).tar.gz" \
+ 		-o "$(CURL_VERSION).tar.gz"
+@@ -492,7 +497,7 @@ $(CURL_VERSION)/.chrome: $(chrome_libs)	$(CURL_VERSION
+ 	  case "$(host_os)" in \
+ 	    darwin*|ios*|tvos*|watchos*) add_libs="-pthread -lc++" ;; \
+ 	    *android*) add_libs="-pthread -lc++" ;; \
+-	    *) add_libs="-pthread -lstdc++ -L$(libunistring_install_dir)/lib -lunistring" ;; \
++	    *) add_libs="-pthread -lstdc++ $(libunistring_install_dir)/lib/libunistring.a" ;; \
+ 	  esac; \
+ 	}
  
- 	{ \
- 		config_flags="--prefix=$(cares_install_dir)"; \
