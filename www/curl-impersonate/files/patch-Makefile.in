@@ -1,16 +1,14 @@
 --- Makefile.in.orig	2026-02-04 03:49:13 UTC
 +++ Makefile.in
-@@ -84,8 +84,8 @@ chrome_libs := $(zlib_static_libs) $(zstd_static_libs)
+@@ -84,7 +84,7 @@ chrome_libs := $(zlib_static_libs) $(zstd_static_libs)
  
  # Dependencies needed to compile the Chrome version
  chrome_libs := $(zlib_static_libs) $(zstd_static_libs) $(brotli_static_libs) $(boringssl_static_libs) $(nghttp2_static_libs) $(ngtcp2_static_libs) $(nghttp3_static_libs)
 -ifneq ($(filter linux%,$(host_os)),)
--chrome_libs += $(libidn2_static_libs)
 +ifneq ($(filter freebsd%,$(host_os)),)
-+chrome_libs += $(libidn2_static_libs) $(libunistring_static_libs)
+ chrome_libs += $(libidn2_static_libs)
  endif
  
- # Auto-generate Makefile help.
 @@ -125,7 +125,8 @@ install:
  	cd $(CURL_VERSION)
  	$(MAKE) install-exec DESTDIR="$(DESTDIR)" MAKEFLAGS=
