@@ -81,8 +81,4 @@ post-extract:
 .	endif
 .endfor
 
-post-install:
-	# resolve conflict with ftp/curl
-	${MV} ${STAGEDIR}${PREFIX}/bin/wcurl ${STAGEDIR}${PREFIX}/bin/wcurl-impersonate
-
 .include <bsd.port.mk>
