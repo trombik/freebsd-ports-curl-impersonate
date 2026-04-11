@@ -1,6 +1,6 @@
---- Makefile.orig	2025-12-16 02:52:44 UTC
+--- Makefile.orig	2026-04-03 09:42:49 UTC
 +++ Makefile
-@@ -11,9 +11,6 @@ curl-impersonate-$(VERSION)/patches: $(CURL_VERSION)
+@@ -17,9 +17,6 @@ curl-impersonate-$(VERSION)/patches: $(CURL_VERSION)
  	mv curl-$(CURL_VERSION) $(CURL_VERSION)
  
  curl-impersonate-$(VERSION)/patches: $(CURL_VERSION)
@@ -10,7 +10,7 @@
  
  .preprocessed: curl-impersonate-$(VERSION)/patches
  	cd $(CURL_VERSION)
-@@ -49,8 +46,6 @@ build: .preprocessed
+@@ -55,8 +52,6 @@ build: .preprocessed
  
  build: .preprocessed
  	rm -rf dist/
@@ -18,4 +18,4 @@
 -	python -m build --wheel
  
  lint:
- 	ruff check --exclude issues
+ 	uv run ruff check --exclude issues
