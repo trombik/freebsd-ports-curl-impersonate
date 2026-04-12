@@ -1,0 +1,11 @@
+--- pyproject.toml.orig	2026-04-12 01:19:12 UTC
++++ pyproject.toml
+@@ -59,7 +59,7 @@ curl-cffi = [
+     "yt-dlp-ejs==0.3.1",
+ ]
+ curl-cffi = [
+-    "curl-cffi>=0.5.10,!=0.6.*,!=0.7.*,!=0.8.*,!=0.9.*,<0.14; implementation_name=='cpython'",
++    "curl-cffi>=0.5.10,!=0.6.*,!=0.7.*,!=0.8.*,!=0.9.*,<0.16; implementation_name=='cpython'",
+ ]
+ secretstorage = [
+     "cffi",
